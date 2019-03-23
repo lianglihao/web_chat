@@ -16,7 +16,7 @@ export default {
   name: 'about',
   data() {
     return {
-      oldMsgList:['大家好','你好'],
+      oldMsgList:['大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','1'],
       newMsgList: {},
       inputValue: '',
       socket: null,
@@ -25,6 +25,9 @@ export default {
     }
   },
   created: function() {
+    this.$nextTick(() => {
+      document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    });
     var that = this;
     this.userName = this.$route.query.userName;
     console.log(this.$route.query.userName);
@@ -62,18 +65,7 @@ export default {
         })
         console.log('数据变化')
     }
-}
-//   watch: {
-//    chatlog() {
-//      console.log("chatlog change");
-//      this.$nextTick(() => {
-//        var container = this.$el.querySelector("#messages");
-//        console.log(container);
-//        container.scrollTop = container.scrollHeight;
-//      })
-//      //  document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight+150;
-//    }
-//  }
+  }
 }
 </script>
 
