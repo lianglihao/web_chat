@@ -1,8 +1,9 @@
 <template>
   <div class="about">
-    <ul id="messages">
-      <li v-for="(item) in oldMsgList" :key="item.index">{{item}}</li>
-    </ul>
+    <div>当前在线人数{{clienNum}}</div>
+    <div id="messages">
+      <p v-for="(item) in oldMsgList" :key="item.index">{{item}}</p>
+    </div>
     <form action="" onkeydown="if(event.keyCode==13)return false;">
       <input id="m" autocomplete="off" v-model="inputValue" />
       <input type="button" value="Send" @click="send" />
@@ -19,7 +20,8 @@ export default {
       newMsgList: {},
       inputValue: '',
       socket: null,
-      userName: ''
+      userName: '',
+      clienNum: 0
     }
   },
   created: function() {
@@ -50,17 +52,38 @@ export default {
       that.oldMsgList.push(msg);
     });
     this.socket.on('loginNews', function(data) {
-      console.log(data);
       that.oldMsgList.push(`可爱的${data}上线啦`);
-    })
-  }
+    });
+  },
+  watch: {
+    oldMsgList() {
+        this.$nextTick(() => {
+          document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        })
+        console.log('数据变化')
+    }
+}
+//   watch: {
+//    chatlog() {
+//      console.log("chatlog change");
+//      this.$nextTick(() => {
+//        var container = this.$el.querySelector("#messages");
+//        console.log(container);
+//        container.scrollTop = container.scrollHeight;
+//      })
+//      //  document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight+150;
+//    }
+//  }
 }
 </script>
 
 <style scoped>
 #messages{
-  list-style-type: none;
-  padding-inline-start: 0px;
+  box-sizing: border-box;
+  height: 400px;
+  width: 300px;
+  background-color: aliceblue;
+  overflow: auto;
 } 
 .about{
   width: 500px;
