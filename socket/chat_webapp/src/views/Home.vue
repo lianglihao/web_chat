@@ -31,7 +31,10 @@ export default {
         }
       });
     }
-  }
+  },
+  beforeCreate: function(){
+    sessionStorage.removeItem('userName');
+  },
 }
 </script>
 

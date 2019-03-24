@@ -1,13 +1,18 @@
 <template>
   <div class="about">
-    <div>当前在线人数{{clienNum}}</div>
-    <div id="messages">
-      <p v-for="(item) in oldMsgList" :key="item.index">{{item}}</p>
+    <div class="left">
+      <div>当前在线人数{{userNum}}</div>
+      <p v-for="(item) in users" :key="item.index">{{item}}</p>
     </div>
-    <form action="" onkeydown="if(event.keyCode==13)return false;">
-      <input id="m" autocomplete="off" v-model="inputValue" />
-      <input type="button" value="Send" @click="send" />
-    </form>
+    <div class="right">
+      <div id="messages">
+        <p v-for="(item) in oldMsgList" :key="item.index">{{item}}</p>
+      </div>
+      <form action="" onkeydown="if(event.keyCode==13)return false;">
+        <input id="m" autocomplete="off" v-model="inputValue" />
+        <input type="button" value="Send" @click="send" />
+      </form>
+    </div>
   </div>
 </template>
 
@@ -16,15 +21,18 @@ export default {
   name: 'about',
   data() {
     return {
-      oldMsgList:['大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','大家好','你好','1'],
+      oldMsgList:['大家好','你好'],
       newMsgList: {},
       inputValue: '',
       socket: null,
       userName: '',
-      clienNum: 0
+      userNum: 0,
+      users: ['1','2']
     }
   },
   created: function() {
+    sessionStorage.setItem('status',1);
+    var status = sessionStorage.getItem('status');
     this.$nextTick(() => {
       document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
     });
@@ -47,9 +55,17 @@ export default {
       console.log(this.inputValue);
       this.socket.emit('chat_message',this.inputValue);
       this.inputValue = '';
+      console.log(sessionStorage.getItem('status'));
     },
+    beforeunloadHandler (e) {
+      // window.open("https://www.cnblogs.com/lijshui/p/7451360.html");  
+    },
+    endd: function() {
+      console.log('endddd');
+    }
   },
   mounted(){
+    // window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
     var that = this;
     this.socket.on('chat_message', function(msg) {
       that.oldMsgList.push(msg);
@@ -57,6 +73,13 @@ export default {
     this.socket.on('loginNews', function(data) {
       that.oldMsgList.push(`可爱的${data}上线啦`);
     });
+    this.socket.on("userNum", (num) => {
+      this.userNum = num;
+    })
+    // this.socket.emit('loginout',sessionStorage.getItem('status'));
+    // this.socket.on("userNum", (num) => {
+    //   that.userNum = num;
+    // })
   },
   watch: {
     oldMsgList() {
@@ -65,7 +88,13 @@ export default {
         })
         console.log('数据变化')
     }
-  }
+  },
+  beforeRouteLeave(to,from,next)  {
+    if(this.socket){
+      this.socket.close();
+      next();
+    }
+    }
 }
 </script>
 
@@ -79,13 +108,18 @@ export default {
 } 
 .about{
   width: 500px;
-    height: 500px;
-    background-color: pink;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
+  height: 500px;
+  background-color: pink;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: space-around;
+  align-items: center;
+}
+.left{
+  height: 423px;
+  width: 150px;
+  background-color: aliceblue;
 }
 </style>
