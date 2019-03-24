@@ -39,7 +39,7 @@ export default {
     var that = this;
     this.userName = this.$route.query.userName;
     console.log(this.$route.query.userName);
-    this.socket = io("http://localhost:3000");
+    this.socket = io(`http://localhost:3000?userName=${that.userName}`);
     console.log(this.socket);
     if(sessionStorage.getItem('userName') == null){
       console.log('首次登录，发送登录信息');
@@ -55,13 +55,9 @@ export default {
       console.log(this.inputValue);
       this.socket.emit('chat_message',this.inputValue);
       this.inputValue = '';
-      console.log(sessionStorage.getItem('status'));
     },
     beforeunloadHandler (e) {
       // window.open("https://www.cnblogs.com/lijshui/p/7451360.html");  
-    },
-    endd: function() {
-      console.log('endddd');
     }
   },
   mounted(){
@@ -74,19 +70,14 @@ export default {
       that.oldMsgList.push(`可爱的${data}上线啦`);
     });
     this.socket.on("userNum", (num) => {
-      this.userNum = num;
+      that.userNum = num;
     })
-    // this.socket.emit('loginout',sessionStorage.getItem('status'));
-    // this.socket.on("userNum", (num) => {
-    //   that.userNum = num;
-    // })
   },
   watch: {
     oldMsgList() {
-        this.$nextTick(() => {
-          document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-        })
-        console.log('数据变化')
+      this.$nextTick(() => {
+        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+      });
     }
   },
   beforeRouteLeave(to,from,next)  {
@@ -94,7 +85,7 @@ export default {
       this.socket.close();
       next();
     }
-    }
+  }
 }
 </script>
 

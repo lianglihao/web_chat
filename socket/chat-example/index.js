@@ -15,6 +15,7 @@ users = [];
 
 io.on('connection', function(socket){
     userNum++;
+    console.log(socket.handshake.query.userName,1111111);
     io.emit('userNum',userNum);
     console.log(userNum);
     console.log('a user connected');
