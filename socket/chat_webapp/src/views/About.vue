@@ -1,15 +1,15 @@
 <template>
   <div class="about">
-    <div class="left">
+    <div id="left">
       <div>当前在线人数{{userNum}}</div>
       <p v-for="(item) in users" :key="item.index">{{item}}</p>
     </div>
     <div class="right">
       <div id="messages">
-        <p v-for="(item) in oldMsgList" :key="item.index">{{item}}</p>
+        <p v-for="(item) in oldMsgList" :key="item.index">{{item.name}}:{{item.msg}}</p>
       </div>
       <form action="" onkeydown="if(event.keyCode==13)return false;">
-        <input id="m" autocomplete="off" v-model="inputValue" />
+        <input id="m" autocomplete="off" @keyup.enter="send" v-model="inputValue" />
         <input type="button" value="Send" @click="send" />
       </form>
     </div>
@@ -21,13 +21,21 @@ export default {
   name: 'about',
   data() {
     return {
-      oldMsgList:['大家好','你好'],
-      newMsgList: {},
+      oldMsgList: [{
+        name: '1',
+        msg: 'hello'
+      },
+      {
+        name: '2',
+        msg: 'world'
+      }
+      ],
+      newMsgList: [],
       inputValue: '',
       socket: null,
       userName: '',
       userNum: 0,
-      users: ['1','2']
+      users: []
     }
   },
   created: function() {
@@ -39,7 +47,7 @@ export default {
     var that = this;
     this.userName = this.$route.query.userName;
     console.log(this.$route.query.userName);
-    this.socket = io(`http://localhost:3000?userName=${that.userName}`);
+    this.socket = io(`http://139.199.206.151:3000?userName=${that.userName}`);
     console.log(this.socket);
     if(sessionStorage.getItem('userName') == null){
       console.log('首次登录，发送登录信息');
@@ -51,14 +59,13 @@ export default {
   },
   methods:{
     send: function(e) {
-      console.log(123);
-      console.log(this.inputValue);
-      this.socket.emit('chat_message',this.inputValue);
+      this.socket.emit('chat_message',{name:this.userName,msg:this.inputValue});
       this.inputValue = '';
     },
-    beforeunloadHandler (e) {
-      // window.open("https://www.cnblogs.com/lijshui/p/7451360.html");  
-    }
+    // beforeunloadHandler (e) {
+    //   // window.open("https://www.cnblogs.com/lijshui/p/7451360.html");
+    //   this.socket.emit('userLogout',this.userName);  
+    // }
   },
   mounted(){
     // window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
@@ -67,16 +74,27 @@ export default {
       that.oldMsgList.push(msg);
     });
     this.socket.on('loginNews', function(data) {
-      that.oldMsgList.push(`可爱的${data}上线啦`);
+      that.$message({
+        message: `迷人的${data}上线啦`,
+        center: true
+      });
     });
     this.socket.on("userNum", (num) => {
       that.userNum = num;
-    })
+    });
+    this.socket.on("users", (users) => {
+      that.users = users;
+    });
   },
   watch: {
     oldMsgList() {
       this.$nextTick(() => {
         document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+      });
+    },
+    users() {
+      this.$nextTick(() => {
+        document.getElementById('left').scrollTop = document.getElementById('left').scrollHeight;
       });
     }
   },
@@ -85,7 +103,13 @@ export default {
       this.socket.close();
       next();
     }
-  }
+  },
+  destroyed:function() {
+    
+  },
+  // updated() {
+  //   window.open("https://www.cnblogs.com/lijshui/p/7451360.html");  
+  // }
 }
 </script>
 
@@ -108,7 +132,7 @@ export default {
   justify-content: space-around;
   align-items: center;
 }
-.left{
+#left{
   height: 423px;
   width: 150px;
   background-color: aliceblue;
