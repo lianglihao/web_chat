@@ -6,7 +6,6 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  // base:__dirname,
   base: process.env.BASE_URL,
   routes: [
     {
@@ -25,10 +24,7 @@ export default new Router({
     {
       path: '/test',
       name: 'test',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Test.vue')
+      component: () => import('./views/Test.vue')
     }
   ]
 })
